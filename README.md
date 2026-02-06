@@ -7,6 +7,22 @@ Basic engine of Maxim Thibodeau
 
 <hr>
 
+## Operations Windows
+
+### Install visual code: [VisualCode](https://code.visualstudio.com/download)
+### Install GIT: [GIT](https://git-scm.com/install/windows)
+### Install CMake: [CMAKE](https://cmake.org/download/)
+### Install VS: [VS](https://visualstudio.microsoft.com/vs/community/)
+### Create a file in folder .vscode/settings.json with the content:
+#### { "cmake.configureArgs": [ "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" ] }
+### Clone the repository
+### Now you can build-debug/run
+
+
+## Operations Linux
+
+### Install visual code: [VisualCode](https://code.visualstudio.com/download)
+
 ## Credits
 ### Special thanks for authors and developers of the following projects and resources:
 * Vulkan Cookbook
