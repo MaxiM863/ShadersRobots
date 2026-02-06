@@ -36,7 +36,8 @@ if(WIN32)
     add_custom_command(TARGET ${PROJECT_NAME}  POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
                 ${CMAKE_CURRENT_SOURCE_DIR}/Data
-                ${CMAKE_CURRENT_BINARY_DIR}/Debug/Data)
+                ${CMAKE_CURRENT_BINARY_DIR}/Data)
+
 
 endif(WIN32)
 
@@ -62,5 +63,7 @@ if(UNIX)
                 ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 endif(UNIX)
+
+target_compile_definitions(EngineMaxim PRIVATE CMAKE_EXPORT_COMPILE_COMMANDS=1)
 
 target_include_directories(EngineMaxim PRIVATE "./Cookbook" "./Samples/Common_Files" "./Library/Common_Files" "./Library/Source_Files" "./External" "./MaximEngine" "./build/_deps/glm-src/")

@@ -8,9 +8,6 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include <glm/gtc/type_ptr.hpp>
 
-namespace vulkancookbook
-{
-
 class Map
 {
     
@@ -532,7 +529,7 @@ public:
 
         BindVertexBuffers( CommandBuffer, 0, {{ vectorVertexBuffer.at(0), 0 }} );
               
-        BindDescriptorSets( CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *PipelineLayout, 0, {DescriptorSets[0]}, { } );
+        BindDescriptorSets( CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *PipelineLayout, 0, {DescriptorSets[0]}, { 0,0 } );
         
         std::array<float, 4> light_position = { 0.0f, 10.0f, 0.0f, 0.0f };
         ProvideDataToShadersThroughPushConstants( CommandBuffer, *PipelineLayout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof( float ) * 4, &light_position[0] );
@@ -575,4 +572,3 @@ public:
         return true;
     }   
 };
-}

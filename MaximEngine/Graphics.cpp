@@ -51,7 +51,7 @@ VkDestroyer(VkSampler)              Sampler2;
 
 ///////////////////////////////////////////////////////////////
 
-vulkancookbook::Map                                 board;
+Map                                 board;
 
 int                                 meshPos;
 
@@ -78,7 +78,7 @@ public:
         //m_scene = &scene;
     }
 
-private:
+public:
 
     bool Initialize(WindowParameters window_parameters)
     {     
