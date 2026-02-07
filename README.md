@@ -9,7 +9,7 @@ Basic engine of Maxim Thibodeau
 
 ## Install: (sometime re-open visual-code)
 
-## Operations Windows
+## Operations Windows (Host)
 
 - Install visual code: [VisualCode](https://code.visualstudio.com/download)
 - Install GIT: [GIT](https://git-scm.com/install/windows)
@@ -21,7 +21,7 @@ Basic engine of Maxim Thibodeau
 - Now you can build-debug/run
 
 
-## Operations Linux
+## Operations Linux (VirtualBox)
 
 - Install visual code: [VisualCode](https://code.visualstudio.com/download)
 - In the terminal: 
