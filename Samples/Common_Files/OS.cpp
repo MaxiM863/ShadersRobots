@@ -330,7 +330,7 @@ void demo_run_xlib(VulkanCookbook::VulkanCookbookSampleBase& sample, WindowParam
     if( sample.IsReady() ) {
           
       sample.UpdateTime();
-      if(!sample.Draw()) std::cout << "No draw!!!";
+      sample.Draw();
       sample.MouseReset();
     }
   }
