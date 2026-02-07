@@ -102,7 +102,7 @@ public:
         
         VulkanCookbook::Mesh m_Tour;
 
-        VulkanCookbook::Load3DModelFromObjFile( "Data/Models/chess_cavalier.obj", true, true, true, true, m_Tour, &stride );
+        VulkanCookbook::Load3DModelFromObjFile( "Data/Models/map.obj", true, true, true, false, m_Tour, &stride );
 
         Model.push_back(m_Tour);
 
@@ -159,7 +159,7 @@ public:
             return false;
         }
 
-        if( !UpdateStagingBuffer( true, logicalDevice, Swapchain.Size.width, Swapchain.Size.height ) ) 
+        if( !UpdateStagingBuffer( true, logicalDevice, Swapchain.Size.width, Swapchain.Size.height, Camera.GetMatrix() ) ) 
         {
             return false;
         }
@@ -544,7 +544,7 @@ public:
     }
     
 
-    bool UpdateStagingBuffer( bool force, VkDevice LogicalDevice, float width, float height )
+    bool UpdateStagingBuffer( bool force, VkDevice LogicalDevice, float width, float height, VulkanCookbook::Matrix4x4 vvv )
     {  
 
         if(force)
@@ -554,7 +554,7 @@ public:
 
           
 
-            VulkanCookbook::Matrix4x4 view = Camera.GetMatrix();
+            VulkanCookbook::Matrix4x4 view = vvv;
 
             VulkanCookbook::Matrix4x4 model_view_matrix = view;
 
@@ -562,7 +562,7 @@ public:
               return false;
             }
 
-            VulkanCookbook::Matrix4x4 perspective_matrix = VulkanCookbook::PreparePerspectiveProjectionMatrix( width / height, 90.0f, 0.1f, 100.0f );
+            VulkanCookbook::Matrix4x4 perspective_matrix = VulkanCookbook::PreparePerspectiveProjectionMatrix( width / height, 90.0f, 1.0f, 1000.0f );
 
             if( !VulkanCookbook::MapUpdateAndUnmapHostVisibleMemory( LogicalDevice, *StagingBufferMemory, sizeof( model_view_matrix[0] ) * model_view_matrix.size(), sizeof( perspective_matrix[0] ) * perspective_matrix.size(), &perspective_matrix[0], true, nullptr ) ) {
               return false;

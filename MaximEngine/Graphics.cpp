@@ -192,7 +192,27 @@ public:
     
     void OnMouseEvent()
     {
-        board.UpdateStagingBuffer(true, LogicalDevice.Object.Handle, Swapchain.Size.width, Swapchain.Size.height);
+      if( MouseState.Buttons[0].IsPressed)
+      {
+        float horizontal_angle = 0.0f;
+        float vertical_angle = 0.0f;
+        
+        horizontal_angle += 0.5f * MouseState.Position.Delta.X;
+        vertical_angle -= 0.5f * MouseState.Position.Delta.Y;
+
+        if( vertical_angle > 180.0f ) {
+          vertical_angle = 180.0f;
+        }
+
+        if( vertical_angle < -180.0f ) {
+          vertical_angle = -180.0f;
+        }
+
+        Camera.RotateHorizontally(horizontal_angle);
+        Camera.RotateVertically(vertical_angle);
+      } 
+
+      board.UpdateStagingBuffer(true, LogicalDevice.Object.Handle, Swapchain.Size.width, Swapchain.Size.height, Camera.GetMatrix());
     }
 
     
@@ -205,7 +225,7 @@ public:
 
         if (IsReady()) {
 
-          board.UpdateStagingBuffer(true, LogicalDevice.Object.Handle, Swapchain.Size.width, Swapchain.Size.height);
+          board.UpdateStagingBuffer(true, LogicalDevice.Object.Handle, Swapchain.Size.width, Swapchain.Size.height, Camera.GetMatrix());
 
             /*if (!UpdateStagingBuffer(true)) {
                 return false;
