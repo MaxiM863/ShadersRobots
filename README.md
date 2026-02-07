@@ -25,7 +25,7 @@ Basic engine of Maxim Thibodeau
 
 - Install visual code: [VisualCode](https://code.visualstudio.com/download)
 - In the terminal: 
-    - sudo add-apt-repository ppa:git-core/ppa
+    - sudo **add-apt-repository\*\* ppa:git-core/ppa
     - sudo apt update; sudo apt install git
     - sudo apt install build-essential
     - sudo apt update
