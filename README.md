@@ -1,7 +1,7 @@
 
 
 
-# Vulkan Maxim Engine (WIN32/LINUX)
+# Vulkan Maxim Engine (WIN32/LINUX) ©2025 Maxim Thibodeau. All Rights Reserved.
 
 Basic engine of Maxim Thibodeau
 
