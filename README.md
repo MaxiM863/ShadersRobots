@@ -7,22 +7,32 @@ Basic engine of Maxim Thibodeau
 
 <hr>
 
+## Install: (sometime re-open visual-code)
+
 ## Operations Windows
 
 - Install visual code: [VisualCode](https://code.visualstudio.com/download)
 - Install GIT: [GIT](https://git-scm.com/install/windows)
 - Install CMake: [CMAKE](https://cmake.org/download/)
+- Install CMAKETool in visualcode (plugin)
 - Install VS: [VS](https://visualstudio.microsoft.com/vs/community/)
 - Install Vulkan SDK: [Vulkan](https://vulkan.lunarg.com/sdk/home)
-- Create a file in folder .vscode/settings.json with the content:
-    - { "cmake.configureArgs": [ "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" ] }
 - Clone the repository
 - Now you can build-debug/run
 
 
 ## Operations Linux
 
-### Install visual code: [VisualCode](https://code.visualstudio.com/download)
+- Install visual code: [VisualCode](https://code.visualstudio.com/download)
+- In the terminal: 
+    - sudo add-apt-repository ppa:git-core/ppa
+    - sudo apt update; sudo apt install git
+    - sudo apt install build-essential
+    - sudo apt update
+    - sudo apt install cmake
+    - sudo apt install libx11-dev
+    - Now you can build-debug/run
+
 
 
 ## Credits
