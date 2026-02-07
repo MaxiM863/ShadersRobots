@@ -31,6 +31,7 @@ Basic engine of Maxim Thibodeau
     - sudo apt update
     - sudo apt install cmake
     - sudo apt install libx11-dev
+    - Clone the repository
     - Now you can build-debug/run
 
 
