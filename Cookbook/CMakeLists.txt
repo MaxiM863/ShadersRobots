@@ -52,7 +52,7 @@ if(UNIX)
 
 endif(UNIX)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set_target_properties(Cookbook PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(Cookbook PUBLIC "../Library/Source_Files" "../Library/Common_Files" "../External")

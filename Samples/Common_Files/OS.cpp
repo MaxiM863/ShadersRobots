@@ -183,7 +183,8 @@ namespace VulkanCookbook {
 
 void demo_run_xlib(VulkanCookbook::VulkanCookbookSampleBase& sample, WindowParameters wp, bool& test);
 
-Atom xlib_wm_delete_window;
+//Atom xlib_wm_delete_window;
+static Atom wm_delete_window;
 
 WindowFramework::WindowFramework( const char               * window_title,
                                     int                        x,
@@ -196,7 +197,7 @@ WindowFramework::WindowFramework( const char               * window_title,
     Created( false ) {
     WindowParams.Dpy = XOpenDisplay(nullptr);
     
-    if(WindowParams.Dpy != NULL) std::cout << "!NULL";
+    if(WindowParams.Dpy != NULL);
     
     XInitThreads();
     
@@ -238,7 +239,9 @@ WindowFramework::WindowFramework( const char               * window_title,
                CurrentTime);
 
 
-    xlib_wm_delete_window = XInternAtom(WindowParams.Dpy, "WM_DELETE_WINDOW", False);
+    XMapWindow(WindowParams.Dpy, WindowParams.WIndow);
+wm_delete_window = XInternAtom(WindowParams.Dpy, "WM_DELETE_WINDOW", False);
+XSetWMProtocols(WindowParams.Dpy, WindowParams.WIndow, &wm_delete_window, 1);
     
     Created = true;
   }
@@ -258,17 +261,19 @@ WindowFramework::WindowFramework( const char               * window_title,
       XMapWindow(WindowParams.Dpy, WindowParams.WIndow);
 
       demo_run_xlib(Sample, WindowParams, test);
-    }
-
-    XFlush(WindowParams.Dpy);
-    Sample.Deinitialize();
+    }   
   }
 
-  void demo_handle_xlib_event(VulkanCookbook::VulkanCookbookSampleBase& sample, XEvent *event, bool& test) {
+  void demo_handle_xlib_event(VulkanCookbook::VulkanCookbookSampleBase& sample, XEvent *event, bool& test, WindowParameters wp) {
     
     switch (event->type) {
         case ClientMessage:
-            if ((Atom)event->xclient.data.l[0] == xlib_wm_delete_window) test = false;
+            if ((Atom)event->xclient.data.l[0] == wm_delete_window)
+            {
+              test = false;
+              XFlush(wp.Dpy);
+              sample.Deinitialize();
+            }
             break;
         case KeyPress:
             switch (event->xkey.keycode) {
@@ -324,13 +329,13 @@ void demo_run_xlib(VulkanCookbook::VulkanCookbookSampleBase& sample, WindowParam
       
       XNextEvent(wp.Dpy, &event);
             
-        demo_handle_xlib_event(sample, &event, test);
+        demo_handle_xlib_event(sample, &event, test, wp);
       }
 
-    if( sample.IsReady() ) {
+    if( test && sample.IsReady() ) {
           
       sample.UpdateTime();
-      if(!sample.Draw()) std::cout << "No draw!!!";
+      sample.Draw();
       sample.MouseReset();
     }
   }
