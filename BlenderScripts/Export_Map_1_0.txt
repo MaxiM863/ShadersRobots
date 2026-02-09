@@ -1,0 +1,42 @@
+import bpy
+import bmesh
+
+save_to_file = 'F:/Codes/ShadersRobots/Data/Models/map.txt'
+ 
+cntr = 0 
+ 
+with open(save_to_file, 'w') as file:
+    
+    for i in bpy.data.scenes['Scene'].objects:
+                
+        if(i.type == 'MESH'):
+            
+            mat = i.matrix_world
+            
+            arrayVertices = []
+            
+                      
+            for vert in i.data.vertices:
+                
+                vertf = mat @ vert.co
+                
+                test = False
+                
+                for j in arrayVertices:
+                    
+                    if(j[0] == vertf.x and j[1] == vertf.y and j[2] == vertf.z):
+                        
+                        test = True
+                    
+                if(test == False):
+                        
+                    file.write(str(vertf.x) + ' ' + str(vertf.y) + ' ' + str(vertf.z) + ' ')
+                    d = []
+                    d.append(vertf.x)
+                    d.append(vertf.y)
+                    d.append(vertf.z)
+                    arrayVertices.append(d)       
+                  
+    file.write('\n')
+
+file.close()

@@ -16,7 +16,7 @@ target_sources(EngineMaxim PRIVATE
 "../Samples/Common_Files/CookbookSampleFramework.cpp"
 "../Samples/Common_Files/OrbitingCamera.cpp")
 
-target_include_directories(EngineMaxim PRIVATE "./Chess")
+target_include_directories(EngineMaxim PRIVATE "./Chess" "./TextEngine")
 
 include(FetchContent)
 

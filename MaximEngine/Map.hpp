@@ -1,4 +1,8 @@
+#include <map>
+#include <string>
 #include <vector>
+#include <sstream>
+#include <fstream>
 
 #include "CookbookSampleFramework.h"
 
@@ -7,6 +11,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include <glm/gtc/type_ptr.hpp>
+#include <algorithm>
 
 class Map
 {
@@ -102,9 +107,40 @@ public:
         
         VulkanCookbook::Mesh m_Tour;
 
-        VulkanCookbook::Load3DModelFromObjFile( "Data/Models/map.obj", true, true, true, false, m_Tour, &stride );
+        //VulkanCookbook::Load3DModelFromObjFile( "Data/Models/map.obj", true, true, true, false, m_Tour, &stride );
 
-        Model.push_back(m_Tour);
+        std::stringstream errss;
+
+        std::ifstream ifs("./Data/Models/map.txt");
+        if (!ifs) {
+            errss << "Cannot open file [" << "]" << std::endl;
+            
+            return false;
+        }
+
+        std::vector<glm::vec3> df;
+
+        while(ifs.eof() == false)
+        {
+            float x, y, z;
+            ifs >> x >> y >> z;
+            
+            df.emplace_back(x, y, z);
+        }
+
+        // Sort the vector
+        std::sort(df.begin(), df.end(), &Map::comparePoints);
+
+        unsigned short* points = new unsigned short[df.size()*3];
+
+        for(int i = 0; i < df.size(); i++)
+        {
+            points[3 * i + 0] = (unsigned short)df[i].x;
+            points[3 * i + 1] = (unsigned short)df[i].y;
+            points[3 * i + 2] = (unsigned short)df[i].z;
+        }
+
+        //Model.push_back(m_Tour);
 
         for(int i = 0; i < Model.size(); i++)
         {//InitVkDestroyer( *LogicalDevice, *vectorVertexBufferMemory.at(i) );
@@ -570,5 +606,12 @@ public:
           } 
           
         return true;
-    }   
+    }
+    
+    // Comparator to sort by x, then y, then z
+    static bool comparePoints(const glm::vec3 &a, const glm::vec3 &b) {
+        if (a.x != b.x) return a.x < b.x; // Sort by x first
+        if (a.y != b.y) return a.y < b.y; // Then by y
+        return a.z < b.z;                 // Finally by z
+    }
 };

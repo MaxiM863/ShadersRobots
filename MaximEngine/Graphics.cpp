@@ -51,7 +51,7 @@ VkDestroyer(VkSampler)              Sampler2;
 
 ///////////////////////////////////////////////////////////////
 
-Map                                 board;
+LetterObj*                                 board;
 
 int                                 meshPos;
 
@@ -90,10 +90,15 @@ public:
       if( !InitializeVulkan( window_parameters ) ) {
         return false;
       }
-      
-      board.Initialize(LogicalDevice.Object.Handle, PhysicalDevice, GraphicsQueue, FramesResources.front().CommandBuffer[0], Swapchain, DepthFormat);
 
+      std::string filename = "Data/Textures/glyphs/output35.png";
+
+      Glyph glyph;
+      glyph.LoadFromFile(filename.c_str());
+
+      board = new LetterObj();
       
+      board->Initialize(LogicalDevice.Object.Handle, PhysicalDevice, GraphicsQueue, FramesResources.front().CommandBuffer[0], Swapchain, DepthFormat, Camera, glyph.getData(), glyph.width, glyph.height );
 
       return true;
     }
@@ -101,9 +106,6 @@ public:
     virtual bool Draw() override {
       
       auto prepare_frame = [&]( std::vector<VkCommandBuffer> command_buffer, uint32_t swapchain_image_index, VkFramebuffer framebuffer ) {
-        
-
-
         
            int i = 0;
           
@@ -117,7 +119,7 @@ public:
             UpdateUniformBuffer = false;
 
             BufferTransition pre_transfer_transition = {
-              *board.UniformBuffer,               // VkBuffer         Buffer
+              *board->UniformBuffer,               // VkBuffer         Buffer
               VK_ACCESS_UNIFORM_READ_BIT,   // VkAccessFlags    CurrentAccess
               VK_ACCESS_TRANSFER_WRITE_BIT, // VkAccessFlags    NewAccess
               VK_QUEUE_FAMILY_IGNORED,      // uint32_t         CurrentQueueFamily
@@ -132,10 +134,10 @@ public:
                 2 * 16 * sizeof( float )  // VkDeviceSize     size
               }
             };
-            CopyDataBetweenBuffers( command_buffer[i], *board.StagingBuffer, *board.UniformBuffer, regions );
+            CopyDataBetweenBuffers( command_buffer[i], *board->StagingBuffer, *board->UniformBuffer, regions );
 
             BufferTransition post_transfer_transition = {
-              *board.UniformBuffer,               // VkBuffer         Buffer
+              *board->UniformBuffer,               // VkBuffer         Buffer
               VK_ACCESS_TRANSFER_WRITE_BIT, // VkAccessFlags    CurrentAccess
               VK_ACCESS_UNIFORM_READ_BIT,   // VkAccessFlags    NewAccess
               VK_QUEUE_FAMILY_IGNORED,      // uint32_t         CurrentQueueFamily
@@ -162,7 +164,12 @@ public:
         // Drawing
         
 
-        board.draw_1(command_buffer[i], framebuffer, {{0,0}, Swapchain.Size});
+        board->draw_1(command_buffer[i], framebuffer, {{0,0}, Swapchain.Size});
+
+
+
+
+
 
         if( PresentQueue.FamilyIndex != GraphicsQueue.FamilyIndex ) {
           ImageTransition image_transition_before_present = {
@@ -186,7 +193,7 @@ public:
       };
 
       return IncreasePerformanceThroughIncreasingTheNumberOfSeparatelyRenderedFrames( *LogicalDevice, GraphicsQueue.Handle, PresentQueue.Handle,
-        Swapchain.Handle.Object.Handle, Swapchain.Size, Swapchain.ImageViewsRaw, board.RenderPass.Object.Handle, {}, prepare_frame, FramesResources );
+        Swapchain.Handle.Object.Handle, Swapchain.Size, Swapchain.ImageViewsRaw, board->RenderPass.Object.Handle, {}, prepare_frame, FramesResources );
     }
 
     
@@ -212,7 +219,7 @@ public:
         Camera.RotateVertically(vertical_angle);
       } 
 
-      board.UpdateStagingBuffer(true, LogicalDevice.Object.Handle, Swapchain.Size.width, Swapchain.Size.height, Camera.GetMatrix());
+      board->UpdateStagingBuffer(true, LogicalDevice.Object.Handle, Swapchain.Size.width, Swapchain.Size.height, Camera.GetMatrix());
     }
 
     
@@ -225,7 +232,7 @@ public:
 
         if (IsReady()) {
 
-          board.UpdateStagingBuffer(true, LogicalDevice.Object.Handle, Swapchain.Size.width, Swapchain.Size.height, Camera.GetMatrix());
+          board->UpdateStagingBuffer(true, LogicalDevice.Object.Handle, Swapchain.Size.width, Swapchain.Size.height, Camera.GetMatrix());
 
             /*if (!UpdateStagingBuffer(true)) {
                 return false;
