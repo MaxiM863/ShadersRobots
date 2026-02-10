@@ -828,8 +828,11 @@ namespace VulkanCookbook {
       return false;
     }
 
+    #ifndef VK_USE_PLATFORM_WIN32_KHR
     image_size = {ww, hh};
     surface_capabilities.currentExtent = image_size;
+    #endif
+    
     if( !ChooseSizeOfSwapchainImages( surface_capabilities, image_size ) ) {
       return false;
     }

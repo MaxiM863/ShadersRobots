@@ -226,9 +226,11 @@ public:
 
     bool Resize(int w, int h)
     {
-        if (!CreateSwapchain(w, h)) {
+
+      if (!CreateSwapchain(w, h)) {
             return false;
         }
+      
 
         if (IsReady()) {
 

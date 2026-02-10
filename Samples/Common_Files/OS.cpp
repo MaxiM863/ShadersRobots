@@ -93,7 +93,10 @@ namespace VulkanCookbook
     WindowParams(),
     Sample( sample ),
     Created( false ) {
-    WindowParams.HInstance = GetModuleHandle( nullptr );
+
+    WindowParams = new WindowParameters();
+
+    WindowParams->HInstance = GetModuleHandle( nullptr );
 
     WNDCLASSEX window_class = {
       sizeof( WNDCLASSEX ),             // UINT         cbSize
@@ -102,7 +105,7 @@ namespace VulkanCookbook
       WindowProcedure,                  // WNDPROC      lpfnWndProc
       0,                                // int          cbClsExtra
       0,                                // int          cbWndExtra
-      WindowParams.HInstance,           // HINSTANCE    hInstance
+      WindowParams->HInstance,           // HINSTANCE    hInstance
       nullptr,                          // HICON        hIcon
       LoadCursor( nullptr, IDC_ARROW ), // HCURSOR      hCursor
       (HBRUSH)(COLOR_WINDOW + 1),       // HBRUSH       hbrBackground
@@ -116,8 +119,8 @@ namespace VulkanCookbook
       return;
     }
 
-    WindowParams.HWnd = CreateWindow( "VulkanCookbook", window_title, WS_OVERLAPPEDWINDOW, x, y, width, height, nullptr, nullptr, WindowParams.HInstance, nullptr );
-    if( !WindowParams.HWnd ) {
+    WindowParams->HWnd = CreateWindow( "VulkanCookbook", window_title, WS_OVERLAPPEDWINDOW, x, y, width, height, nullptr, nullptr, WindowParams->HInstance, nullptr );
+    if( !WindowParams->HWnd ) {
       return;
     }
 
@@ -125,12 +128,12 @@ namespace VulkanCookbook
   }
 
   WindowFramework::~WindowFramework() {
-    if( WindowParams.HWnd ) {
-      DestroyWindow( WindowParams.HWnd );
+    if( WindowParams->HWnd ) {
+      DestroyWindow( WindowParams->HWnd );
     }
 
-    if( WindowParams.HInstance ) {
-      UnregisterClass( "VulkanCookbook", WindowParams.HInstance );
+    if( WindowParams->HInstance ) {
+      UnregisterClass( "VulkanCookbook", WindowParams->HInstance );
     }
   }
 
@@ -138,8 +141,8 @@ namespace VulkanCookbook
     if( Created &&
         Sample.Initialize( WindowParams ) ) {
 
-      ShowWindow( WindowParams.HWnd, SW_SHOWNORMAL );
-      UpdateWindow( WindowParams.HWnd );
+      ShowWindow( WindowParams->HWnd, SW_SHOWNORMAL );
+      UpdateWindow( WindowParams->HWnd );
 
       MSG message;
       bool loop = true;
@@ -157,8 +160,13 @@ namespace VulkanCookbook
             Sample.MouseWheel( static_cast<short>(message.wParam) * 0.002f );
             break;
           case USER_MESSAGE_RESIZE:
-            if( !Sample.Resize() ) {
-              loop = false;
+            {
+              UINT width = LOWORD(message.lParam);
+              UINT height = HIWORD(message.lParam);
+
+              if( !Sample.Resize(width, height) ) {
+                loop = false;
+              }
             }
             break;
           case USER_MESSAGE_QUIT:
@@ -346,18 +354,6 @@ void demo_run_xlib(VulkanCookbook::VulkanCookbookSampleBase& sample, WindowParam
         XNextEvent(wp->Dpy, &event);
             
         demo_handle_xlib_event(sample, &event, test, wp, isResize);
-
-        if(*isResize)
-        {
-          *isResize = false;
-
-          XWindowAttributes attributes;
-
-          if (XGetWindowAttributes(wp->Dpy, *wp->WIndow, &attributes)) {
-
-            sample.Resize(1500,1500);
-          }
-        }
       }
 
     if( test && sample.IsReady() ) {
