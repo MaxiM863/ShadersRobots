@@ -80,7 +80,7 @@ public:
 
 public:
 
-    bool Initialize(WindowParameters window_parameters)
+    bool Initialize(WindowParameters* window_parameters)
     {     
 
       UpdateUniformBuffer = true;
@@ -224,9 +224,9 @@ public:
 
     
 
-    bool Resize()
+    bool Resize(int w, int h)
     {
-        if (!CreateSwapchain()) {
+        if (!CreateSwapchain(w, h)) {
             return false;
         }
 

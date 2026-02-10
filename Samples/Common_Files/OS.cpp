@@ -31,9 +31,10 @@
 
 #include "CookbookSampleFramework.h"
 
-namespace VulkanCookbook {
+namespace VulkanCookbook 
+{  
 
-#ifdef VK_USE_PLATFORM_WIN32_KHR
+  #ifdef VK_USE_PLATFORM_WIN32_KHR
 
   namespace {
     enum UserMessage {
@@ -181,7 +182,7 @@ namespace VulkanCookbook {
   
 #else
 
-void demo_run_xlib(VulkanCookbook::VulkanCookbookSampleBase& sample, WindowParameters wp, bool& test);
+void demo_run_xlib(VulkanCookbook::VulkanCookbookSampleBase& sample, WindowParameters* wp, bool& test, bool* isResize);
 
 //Atom xlib_wm_delete_window;
 static Atom wm_delete_window;
@@ -195,37 +196,44 @@ WindowFramework::WindowFramework( const char               * window_title,
     WindowParams(),
     Sample( sample ),
     Created( false ) {
-    WindowParams.Dpy = XOpenDisplay(nullptr);
+
+      WindowParams = new WindowParameters();
+
+    WindowParams->Dpy = XOpenDisplay(nullptr);
     
-    if(WindowParams.Dpy != NULL);
+    if(WindowParams->Dpy != NULL);
     
     XInitThreads();
+
+    isResize = new bool;
     
-    
+    *isResize = false;
 
     long visualMask = VisualScreenMask;
     int numberOfVisuals;
     XVisualInfo vInfoTemplate = {};
-    vInfoTemplate.screen = DefaultScreen(WindowParams.Dpy);
-    XVisualInfo *visualInfo = XGetVisualInfo(WindowParams.Dpy, visualMask, &vInfoTemplate, &numberOfVisuals);
+    vInfoTemplate.screen = DefaultScreen(WindowParams->Dpy);
+    XVisualInfo *visualInfo = XGetVisualInfo(WindowParams->Dpy, visualMask, &vInfoTemplate, &numberOfVisuals);
 
     Colormap colormap =
-        XCreateColormap(WindowParams.Dpy, RootWindow(WindowParams.Dpy, vInfoTemplate.screen), visualInfo->visual, AllocNone);
+        XCreateColormap(WindowParams->Dpy, RootWindow(WindowParams->Dpy, vInfoTemplate.screen), visualInfo->visual, AllocNone);
 
     XSetWindowAttributes windowAttributes = {};
     windowAttributes.colormap = colormap;
     windowAttributes.background_pixel = 0xFFFFFFFF;
-    windowAttributes.border_pixel = 0;
+    windowAttributes.border_pixel = 5;
     windowAttributes.event_mask = KeyPressMask | KeyReleaseMask | StructureNotifyMask | ExposureMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask;
 
-    WindowParams.WIndow = XCreateWindow(WindowParams.Dpy, RootWindow(WindowParams.Dpy, vInfoTemplate.screen), 0, 0, width,
+    WindowParams->WIndow = new Window();
+
+    *(WindowParams->WIndow) = XCreateWindow(WindowParams->Dpy, RootWindow(WindowParams->Dpy, vInfoTemplate.screen), 0, 0, width,
                                       height, 0, visualInfo->depth, InputOutput, visualInfo->visual,
                                       CWBackPixel | CWBorderPixel | CWEventMask | CWColormap, &windowAttributes); 
 
     //XSelectInput(WindowParams.Dpy, WindowParams.WIndow, ExposureMask | KeyPressMask);
 
 
-    XGrabPointer(WindowParams.Dpy, WindowParams.WIndow, True,
+    XGrabPointer(WindowParams->Dpy, *WindowParams->WIndow, True,
                   ButtonPressMask |
                   ButtonReleaseMask |
                   PointerMotionMask |
@@ -234,14 +242,14 @@ WindowFramework::WindowFramework( const char               * window_title,
                   LeaveWindowMask,
                GrabModeAsync,
                GrabModeAsync,
-               RootWindow(WindowParams.Dpy, DefaultScreen(WindowParams.Dpy)),
+               RootWindow(WindowParams->Dpy, DefaultScreen(WindowParams->Dpy)),
                None,
                CurrentTime);
 
 
-    XMapWindow(WindowParams.Dpy, WindowParams.WIndow);
-wm_delete_window = XInternAtom(WindowParams.Dpy, "WM_DELETE_WINDOW", False);
-XSetWMProtocols(WindowParams.Dpy, WindowParams.WIndow, &wm_delete_window, 1);
+    XMapWindow(WindowParams->Dpy, *WindowParams->WIndow);
+wm_delete_window = XInternAtom(WindowParams->Dpy, "WM_DELETE_WINDOW", False);
+XSetWMProtocols(WindowParams->Dpy, *WindowParams->WIndow, &wm_delete_window, 1);
     
     Created = true;
   }
@@ -258,20 +266,20 @@ XSetWMProtocols(WindowParams.Dpy, WindowParams.WIndow, &wm_delete_window, 1);
 	
       bool test = true;      
 
-      XMapWindow(WindowParams.Dpy, WindowParams.WIndow);
+      
 
-      demo_run_xlib(Sample, WindowParams, test);
+      demo_run_xlib(Sample, WindowParams, test, isResize);
     }   
   }
 
-  void demo_handle_xlib_event(VulkanCookbook::VulkanCookbookSampleBase& sample, XEvent *event, bool& test, WindowParameters wp) {
+  void demo_handle_xlib_event(VulkanCookbook::VulkanCookbookSampleBase& sample, XEvent *event, bool& test, WindowParameters* wp, bool* isResize) {
     
     switch (event->type) {
         case ClientMessage:
             if ((Atom)event->xclient.data.l[0] == wm_delete_window)
             {
               test = false;
-              XFlush(wp.Dpy);
+              XFlush(wp->Dpy);
               sample.Deinitialize();
             }
             break;
@@ -310,26 +318,46 @@ XSetWMProtocols(WindowParams.Dpy, WindowParams.WIndow, &wm_delete_window, 1);
         break;
 
         case ConfigureNotify:
-            {
+            // Check if the size has actually changed to avoid unnecessary repainting
+            if (true) {
+                int current_width = event->xconfigure.width;
+                int current_height = event->xconfigure.height;
+
+                sample.Resize(current_height, current_width);
+                // Call your resize handling and redraw functions here
+                // e.g., resize_and_redraw(current_width, current_height);
             }
             break;
+
         default:
             break;
     }
 }
 
-void demo_run_xlib(VulkanCookbook::VulkanCookbookSampleBase& sample, WindowParameters wp, bool& test) {
+void demo_run_xlib(VulkanCookbook::VulkanCookbookSampleBase& sample, WindowParameters* wp, bool& test, bool* isResize) {
     
   while (test) {
   
     XEvent event;
     
 
-    while (XPending(wp.Dpy) > 0) {
+    while (XPending(wp->Dpy) > 0) {
       
-      XNextEvent(wp.Dpy, &event);
+        XNextEvent(wp->Dpy, &event);
             
-        demo_handle_xlib_event(sample, &event, test, wp);
+        demo_handle_xlib_event(sample, &event, test, wp, isResize);
+
+        if(*isResize)
+        {
+          *isResize = false;
+
+          XWindowAttributes attributes;
+
+          if (XGetWindowAttributes(wp->Dpy, *wp->WIndow, &attributes)) {
+
+            sample.Resize(1500,1500);
+          }
+        }
       }
 
     if( test && sample.IsReady() ) {

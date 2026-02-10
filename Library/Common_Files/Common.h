@@ -72,7 +72,7 @@ namespace VulkanCookbook {
 #else
 
     Display          * Dpy;
-    Window             WIndow;
+    Window           * WIndow;
 
 #endif
   };

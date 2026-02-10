@@ -130,7 +130,7 @@ namespace VulkanCookbook {
     // Override this in a derived class to know when a mouse event occured
   }
 
-  bool VulkanCookbookSample::InitializeVulkan( WindowParameters           window_parameters,
+  bool VulkanCookbookSample::InitializeVulkan( WindowParameters*           window_parameters,
                                                VkPhysicalDeviceFeatures * desired_device_features,
                                                VkImageUsageFlags          swapchain_image_usage,
                                                bool                       use_depth,
@@ -158,7 +158,7 @@ namespace VulkanCookbook {
     }
 
     InitVkDestroyer( Instance, PresentationSurface );
-    if( !CreatePresentationSurface( *Instance, window_parameters, *PresentationSurface ) ) {
+    if( !CreatePresentationSurface( *Instance, *window_parameters, *PresentationSurface ) ) {
       return false;
     }
 
@@ -248,16 +248,17 @@ namespace VulkanCookbook {
       );
     }
 
-    if( !CreateSwapchain( swapchain_image_usage, use_depth, depth_attachment_usage ) ) {
+    if( !CreateSwapchain( 1000,1000,swapchain_image_usage, use_depth, depth_attachment_usage ) ) {
       return false;
     }
 
     return true;
   }
 
-  bool VulkanCookbookSample::CreateSwapchain( VkImageUsageFlags swapchain_image_usage,
+  bool VulkanCookbookSample::CreateSwapchain( int ww, int hh, VkImageUsageFlags swapchain_image_usage,
                                               bool              use_depth,
                                               VkImageUsageFlags depth_attachment_usage ) {
+    
     WaitForAllSubmittedCommandsToBeFinished( *LogicalDevice );
 
     Ready = false;
@@ -271,7 +272,7 @@ namespace VulkanCookbook {
     }
     VkDestroyer(VkSwapchainKHR) old_swapchain = std::move( Swapchain.Handle );
     InitVkDestroyer( LogicalDevice, Swapchain.Handle );
-    if( !CreateSwapchainWithR8G8B8A8FormatAndMailboxPresentMode( PhysicalDevice, *PresentationSurface, *LogicalDevice, swapchain_image_usage, Swapchain.Size, Swapchain.Format, *old_swapchain, *Swapchain.Handle, Swapchain.Images ) ) {
+    if( !CreateSwapchainWithR8G8B8A8FormatAndMailboxPresentMode( ww, hh, PhysicalDevice, *PresentationSurface, *LogicalDevice, swapchain_image_usage, Swapchain.Size, Swapchain.Format, *old_swapchain, *Swapchain.Handle, Swapchain.Images ) ) {
       return false;
     }
     if( !Swapchain.Handle ) {
@@ -310,6 +311,7 @@ namespace VulkanCookbook {
 
     Ready = true;
     return true;
-  }  
+  }
+
 
 } // namespace VulkanCookbook

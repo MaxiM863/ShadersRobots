@@ -22,7 +22,7 @@
 //
 // Vulkan Cookbook
 // ISBN: 9781786468154
-// © Packt Publishing Limited
+// ï¿½ Packt Publishing Limited
 //
 // Author:   Pawel Lapinski
 // LinkedIn: https://www.linkedin.com/in/pawel-lapinski-84522329
@@ -107,9 +107,9 @@ namespace VulkanCookbook {
               VulkanCookbookSampleBase();
     virtual  ~VulkanCookbookSampleBase();
 
-    virtual bool  Initialize( WindowParameters window_parameters ) = 0;
+    virtual bool  Initialize( WindowParameters* window_parameters ) = 0;
     virtual bool  Draw() = 0;
-    virtual bool  Resize() = 0;
+    virtual bool  Resize(int, int) = 0;
     virtual void  Deinitialize() = 0;
     virtual void  MouseClick( size_t button_index, bool state ) final;
     virtual void  MouseMove( int x, int y ) final;
@@ -146,12 +146,12 @@ namespace VulkanCookbook {
     static uint32_t const                     FramesCount = 3;
     static VkFormat const                     DepthFormat = VK_FORMAT_D16_UNORM;
 
-    virtual bool  InitializeVulkan( WindowParameters           window_parameters,
+    virtual bool  InitializeVulkan( WindowParameters*           window_parameters,
                                     VkPhysicalDeviceFeatures * desired_device_features = nullptr,
                                     VkImageUsageFlags          swapchain_image_usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
                                     bool                       use_depth = true,
                                     VkImageUsageFlags          depth_attachment_usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT ) final;
-    virtual bool  CreateSwapchain( VkImageUsageFlags swapchain_image_usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+    virtual bool  CreateSwapchain( int, int, VkImageUsageFlags swapchain_image_usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
                                    bool              use_depth = true,
                                    VkImageUsageFlags depth_attachment_usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT ) final;
     //virtual void  Deinitialize() final;
