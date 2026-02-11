@@ -66,4 +66,5 @@ endif(UNIX)
 
 target_compile_definitions(EngineMaxim PRIVATE CMAKE_EXPORT_COMPILE_COMMANDS=1)
 
+
 target_include_directories(EngineMaxim PRIVATE "./Cookbook" "./Samples/Common_Files" "./Library/Common_Files" "./Library/Source_Files" "./External" "./MaximEngine" "./build/_deps/glm-src/")

@@ -188,7 +188,9 @@ namespace VulkanCookbook
     Sample.Deinitialize();
   }
   
-#else
+#endif
+
+#ifdef VK_USE_PLATFORM_XLIB_KHR
 
 void demo_run_xlib(VulkanCookbook::VulkanCookbookSampleBase& sample, WindowParameters* wp, bool& test, bool* isResize);
 
