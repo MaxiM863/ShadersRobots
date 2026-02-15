@@ -60,7 +60,7 @@ if(UNIX)
 
     link_directories(${X11_LIBRARIES})
 
-    target_link_libraries(EngineMaxim ${X11_LIBRARIES} Cookbook)
+    target_link_libraries(EngineMaxim ${X11_LIBRARIES} Cookbook MaxText glm::glm)
 
     add_custom_command(TARGET ${PROJECT_NAME}  POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory

@@ -18,7 +18,7 @@ class Map
     
     public:
     
-    VkDestroyer( VkSampler )                Sampler;
+    VkDestroyer( VkSampler )                                                Sampler;
     
     VulkanCookbook::VkDestroyer( VulkanCookbook::VkImage )                  Image;
     VulkanCookbook::VkDestroyer( VulkanCookbook::VkDeviceMemory )           ImageMemory;
