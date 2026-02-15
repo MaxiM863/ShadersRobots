@@ -5,18 +5,6 @@ project(EngineMaxim)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_subdirectory(Cookbook)
-add_subdirectory(MaximEngine)
-
-add_executable(EngineMaxim main.cpp)
-
-target_sources(EngineMaxim PRIVATE 
-"../Samples/Common_Files/OS.cpp"
-"../Samples/Common_Files/Camera.cpp"
-"../Samples/Common_Files/CookbookSampleFramework.cpp"
-"../Samples/Common_Files/OrbitingCamera.cpp")
-
-target_include_directories(EngineMaxim PRIVATE "./Chess" "./TextEngine")
 
 include(FetchContent)
 
@@ -28,16 +16,33 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(glm)
 
+FetchContent_Declare(
+	MaxText
+	GIT_REPOSITORY	https://github.com/MaxiM863/MaxText.git
+    GIT_TAG 	 main
+)
+
+FetchContent_MakeAvailable(MaxText)
+
+FetchContent_Declare(
+	CookbookWrapperLib
+	GIT_REPOSITORY https://github.com/MaxiM863/Cookbook.git
+    GIT_TAG main
+)
+
+FetchContent_MakeAvailable(CookbookWrapperLib)
+
+add_executable(EngineMaxim main.cpp)
+
 if(WIN32)
     
-    add_definitions(-DVK_USE_PLATFORM_WIN32_KHR)
-    target_link_libraries(EngineMaxim PRIVATE Cookbook)
+    add_definitions(-DVK_USE_PLATFORM_WIN32_KHR)        
+    target_link_libraries(EngineMaxim PUBLIC MaxText CookbookWrapperLib glm::glm)   
 
     add_custom_command(TARGET ${PROJECT_NAME}  POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
                 ${CMAKE_CURRENT_SOURCE_DIR}/Data
                 ${CMAKE_CURRENT_BINARY_DIR}/Data)
-
 
 endif(WIN32)
 
@@ -67,4 +72,5 @@ endif(UNIX)
 target_compile_definitions(EngineMaxim PRIVATE CMAKE_EXPORT_COMPILE_COMMANDS=1)
 
 
-target_include_directories(EngineMaxim PRIVATE "./Cookbook" "./Samples/Common_Files" "./Library/Common_Files" "./Library/Source_Files" "./External" "./MaximEngine" "./build/_deps/glm-src/")
+
+#target_include_directories(EngineMaxim PRIVATE "./Cookbook" "./Samples/Common_Files" "./Library/Common_Files" "./Library/Source_Files" "./External" "./MaximEngine")

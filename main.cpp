@@ -35,7 +35,9 @@
 // Recipe:  02 Rendering a geometry with fragment specular lighting
 
 #include "CookbookSampleFramework.h"
-#include "Graphics.cpp"
+#include "MaximEngine/Graphics.cpp"
+
+//#include "maxtext-src/TextEngine/test.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -70,6 +72,11 @@ std::vector<std::string> get_filenames( std::filesystem::path path )
 }
 
 int main(void) {
+
+
+	MaxText::MaxText textEngine;
+
+	textEngine.testFunction();
 
 	Graphics engine;
 

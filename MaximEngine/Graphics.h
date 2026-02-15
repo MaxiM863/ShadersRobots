@@ -6,8 +6,10 @@
 #include "Chess/ChessBoard.h"
 #include "Picking.h"
 #include "Map.hpp"
-#include "TextEngine/LetterObj.hpp"
+//#include "TextEngine/Text.hpp"
 
-#include "glm/glm.hpp"
+//#include <glm.hpp>
 #include "glm/gtc/matrix_transform.hpp"
 #include <glm/gtc/type_ptr.hpp>
+
+#include "test.hpp"

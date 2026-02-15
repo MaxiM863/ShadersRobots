@@ -15,7 +15,7 @@ layout( push_constant ) uniform LightParameters {
 layout( location = 0 ) out vec4 frag_color;
 
 void main() {
-  vec4 normal = texture( ImageSampler, vert_texcoord ).rgba;
+  float normal = texture( ImageSampler, vert_texcoord );
   
   if(normal.a < 0.5f) discard;
   

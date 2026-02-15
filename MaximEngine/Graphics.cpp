@@ -1,6 +1,7 @@
 #include "CookbookSampleFramework.h"
 #include "Graphics.h"
 
+
 using namespace VulkanCookbook;
 
 class Graphics : public VulkanCookbook::VulkanCookbookSample
@@ -29,43 +30,41 @@ VkDestroyer(VkDescriptorSetLayout)      DescriptorSetLayout;
 VkDestroyer(VkDescriptorPool)           DescriptorPool;
 std::vector<VkDescriptorSet>            DescriptorSets;
 
-VkDestroyer(VkDescriptorSetLayout)  DescriptorSetLayout2;
-VkDestroyer(VkDescriptorPool)       DescriptorPool2;
-std::vector<VkDescriptorSet>        DescriptorSets2;
+VkDestroyer(VkDescriptorSetLayout)      DescriptorSetLayout2;
+VkDestroyer(VkDescriptorPool)           DescriptorPool2;
+std::vector<VkDescriptorSet>            DescriptorSets2;
+
+VkDestroyer( VkRenderPass )             RenderPass;
+
+bool                                    UpdateUniformBuffer;
 
 
-bool                                UpdateUniformBuffer;
+std::vector<Mesh>                       Model;
 
+VkDestroyer(VkImage)                    Image;
+VkDestroyer(VkDeviceMemory)             ImageMemory;
+VkDestroyer(VkImageView)                ImageView;
+VkDestroyer(VkSampler)                  Sampler;
 
-std::vector<Mesh>                   Model;
-
-VkDestroyer(VkImage)                Image;
-VkDestroyer(VkDeviceMemory)         ImageMemory;
-VkDestroyer(VkImageView)            ImageView;
-VkDestroyer(VkSampler)              Sampler;
-
-VkDestroyer(VkImage)                Image2;
-VkDestroyer(VkDeviceMemory)         ImageMemory2;
-VkDestroyer(VkImageView)            ImageView2;
-VkDestroyer(VkSampler)              Sampler2;
-
-///////////////////////////////////////////////////////////////
-
-LetterObj*                                 board;
-
-int                                 meshPos;
+VkDestroyer(VkImage)                    Image2;
+VkDestroyer(VkDeviceMemory)             ImageMemory2;
+VkDestroyer(VkImageView)                ImageView2;
+VkDestroyer(VkSampler)                  Sampler2;
 
 ///////////////////////////////////////////////////////////////
 
-OrbitingCamera                      Camera;
+//Text*                                 textEngine;
 
-float rotMax;
+int                                     meshPos;
+
+///////////////////////////////////////////////////////////////
+
+OrbitingCamera                          Camera;
+
+float                                   rotMax;
+
 
 public:
-
-    
-
-
 
     Graphics()
     {
@@ -91,14 +90,81 @@ public:
         return false;
       }
 
-      std::string filename = "Data/Textures/glyphs/output35.png";
+      // Render pass
+        std::vector<VkAttachmentDescription> attachment_descriptions = {
+            {
+            0,                                                // VkAttachmentDescriptionFlags     flags
+            Swapchain.Format,                                 // VkFormat                         format
+            VK_SAMPLE_COUNT_1_BIT,                            // VkSampleCountFlagBits            samples
+            VK_ATTACHMENT_LOAD_OP_CLEAR,                      // VkAttachmentLoadOp               loadOp
+            VK_ATTACHMENT_STORE_OP_STORE,                     // VkAttachmentStoreOp              storeOp
+            VK_ATTACHMENT_LOAD_OP_DONT_CARE,                  // VkAttachmentLoadOp               stencilLoadOp
+            VK_ATTACHMENT_STORE_OP_DONT_CARE,                 // VkAttachmentStoreOp              stencilStoreOp
+            VK_IMAGE_LAYOUT_UNDEFINED,                        // VkImageLayout                    initialLayout
+            VK_IMAGE_LAYOUT_PRESENT_SRC_KHR                   // VkImageLayout                    finalLayout
+            },
+            {
+            0,                                                // VkAttachmentDescriptionFlags     flags
+            DepthFormat,                                      // VkFormat                         format
+            VK_SAMPLE_COUNT_1_BIT,                            // VkSampleCountFlagBits            samples
+            VK_ATTACHMENT_LOAD_OP_CLEAR,                      // VkAttachmentLoadOp               loadOp
+            VK_ATTACHMENT_STORE_OP_DONT_CARE,                 // VkAttachmentStoreOp              storeOp
+            VK_ATTACHMENT_LOAD_OP_DONT_CARE,                  // VkAttachmentLoadOp               stencilLoadOp
+            VK_ATTACHMENT_STORE_OP_DONT_CARE,                 // VkAttachmentStoreOp              stencilStoreOp
+            VK_IMAGE_LAYOUT_UNDEFINED,                        // VkImageLayout                    initialLayout
+            VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL  // VkImageLayout                    finalLayout
+            }
+        };
 
-      Glyph glyph;
-      glyph.LoadFromFile(filename.c_str());
+        VkAttachmentReference depth_attachment = {
+            1,                                                // uint32_t                             attachment
+            VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL  // VkImageLayout                        layout
+        };
 
-      board = new LetterObj();
-      
-      board->Initialize(LogicalDevice.Object.Handle, PhysicalDevice, GraphicsQueue, FramesResources.front().CommandBuffer[0], Swapchain, DepthFormat, Camera, glyph.getData(), glyph.width, glyph.height );
+        std::vector<VulkanCookbook::SubpassParameters> subpass_parameters = {
+            {
+            VK_PIPELINE_BIND_POINT_GRAPHICS,              // VkPipelineBindPoint                  PipelineType
+            {},                                           // std::vector<VkAttachmentReference>   InputAttachments
+            {                                             // std::vector<VkAttachmentReference>   ColorAttachments
+                {
+                0,                                          // uint32_t                             attachment
+                VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,   // VkImageLayout                        layout
+                }
+            },
+            {},                                           // std::vector<VkAttachmentReference>   ResolveAttachments
+            &depth_attachment,                            // VkAttachmentReference const        * DepthStencilAttachment
+            {}                                            // std::vector<uint32_t>                PreserveAttachments
+            }
+        };
+
+        std::vector<VkSubpassDependency> subpass_dependencies = {
+            {
+            VK_SUBPASS_EXTERNAL,                            // uint32_t                   srcSubpass
+            0,                                              // uint32_t                   dstSubpass
+            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,              // VkPipelineStageFlags       srcStageMask
+            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,  // VkPipelineStageFlags       dstStageMask
+            VK_ACCESS_MEMORY_READ_BIT,                      // VkAccessFlags              srcAccessMask
+            VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,           // VkAccessFlags              dstAccessMask
+            VK_DEPENDENCY_BY_REGION_BIT                     // VkDependencyFlags          dependencyFlags
+            },
+            {
+            0,                                              // uint32_t                   srcSubpass
+            VK_SUBPASS_EXTERNAL,                            // uint32_t                   dstSubpass
+            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,  // VkPipelineStageFlags       srcStageMask
+            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,              // VkPipelineStageFlags       dstStageMask
+            VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,           // VkAccessFlags              srcAccessMask
+            VK_ACCESS_MEMORY_READ_BIT,                      // VkAccessFlags              dstAccessMask
+            VK_DEPENDENCY_BY_REGION_BIT                     // VkDependencyFlags          dependencyFlags
+            }
+        };
+
+        InitVkDestroyer( LogicalDevice, RenderPass );
+        
+        if( !CreateRenderPass( *LogicalDevice, attachment_descriptions, subpass_parameters, subpass_dependencies, *RenderPass ) ) {
+            return false;
+        }      
+
+      //textEngine = new Text(LogicalDevice.Object.Handle, PhysicalDevice, GraphicsQueue, FramesResources.front().CommandBuffer[0], Swapchain, DepthFormat, Camera, RenderPass.Object.Handle);
 
       return true;
     }
@@ -113,39 +179,7 @@ public:
           return false;
           }
         
-        if( true ) {
-
-          
-            UpdateUniformBuffer = false;
-
-            BufferTransition pre_transfer_transition = {
-              *board->UniformBuffer,               // VkBuffer         Buffer
-              VK_ACCESS_UNIFORM_READ_BIT,   // VkAccessFlags    CurrentAccess
-              VK_ACCESS_TRANSFER_WRITE_BIT, // VkAccessFlags    NewAccess
-              VK_QUEUE_FAMILY_IGNORED,      // uint32_t         CurrentQueueFamily
-              VK_QUEUE_FAMILY_IGNORED       // uint32_t         NewQueueFamily
-            };
-            SetBufferMemoryBarrier( command_buffer[i], VK_PIPELINE_STAGE_VERTEX_SHADER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, { pre_transfer_transition } );
-
-            std::vector<VkBufferCopy> regions = {
-              {
-                0,                        // VkDeviceSize     srcOffset
-                0,                        // VkDeviceSize     dstOffset
-                2 * 16 * sizeof( float )  // VkDeviceSize     size
-              }
-            };
-            CopyDataBetweenBuffers( command_buffer[i], *board->StagingBuffer, *board->UniformBuffer, regions );
-
-            BufferTransition post_transfer_transition = {
-              *board->UniformBuffer,               // VkBuffer         Buffer
-              VK_ACCESS_TRANSFER_WRITE_BIT, // VkAccessFlags    CurrentAccess
-              VK_ACCESS_UNIFORM_READ_BIT,   // VkAccessFlags    NewAccess
-              VK_QUEUE_FAMILY_IGNORED,      // uint32_t         CurrentQueueFamily
-              VK_QUEUE_FAMILY_IGNORED       // uint32_t         NewQueueFamily
-            };
-            SetBufferMemoryBarrier( command_buffer[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_VERTEX_SHADER_BIT, { post_transfer_transition } );
-          
-        }
+        
 
         if( PresentQueue.FamilyIndex != GraphicsQueue.FamilyIndex ) {
           ImageTransition image_transition_before_drawing = {
@@ -162,12 +196,12 @@ public:
         }
 
         // Drawing
-        
+        BeginRenderPass( command_buffer[i], *RenderPass , framebuffer, {{0,0}, Swapchain.Size}, { { 1.0f, 1.0f, 1.0f, 1.0f }, { 1.0f, 0 } }, VK_SUBPASS_CONTENTS_INLINE );
 
-        board->draw_1(command_buffer[i], framebuffer, {{0,0}, Swapchain.Size});
+        //textEngine->draw(command_buffer[i], framebuffer, {{0,0}, Swapchain.Size});
 
 
-
+        EndRenderPass( command_buffer[i] );
 
 
 
@@ -193,7 +227,7 @@ public:
       };
 
       return IncreasePerformanceThroughIncreasingTheNumberOfSeparatelyRenderedFrames( *LogicalDevice, GraphicsQueue.Handle, PresentQueue.Handle,
-        Swapchain.Handle.Object.Handle, Swapchain.Size, Swapchain.ImageViewsRaw, board->RenderPass.Object.Handle, {}, prepare_frame, FramesResources );
+        Swapchain.Handle.Object.Handle, Swapchain.Size, Swapchain.ImageViewsRaw, *RenderPass, {}, prepare_frame, FramesResources );
     }
 
     
@@ -219,7 +253,7 @@ public:
         Camera.RotateVertically(vertical_angle);
       } 
 
-      board->UpdateStagingBuffer(true, LogicalDevice.Object.Handle, Swapchain.Size.width, Swapchain.Size.height, Camera.GetMatrix());
+      //board->UpdateStagingBuffer(true, LogicalDevice.Object.Handle, Swapchain.Size.width, Swapchain.Size.height, Camera.GetMatrix());
     }
 
     
@@ -234,7 +268,7 @@ public:
 
         if (IsReady()) {
 
-          board->UpdateStagingBuffer(true, LogicalDevice.Object.Handle, Swapchain.Size.width, Swapchain.Size.height, Camera.GetMatrix());
+          //board->UpdateStagingBuffer(true, LogicalDevice.Object.Handle, Swapchain.Size.width, Swapchain.Size.height, Camera.GetMatrix());
 
             /*if (!UpdateStagingBuffer(true)) {
                 return false;
