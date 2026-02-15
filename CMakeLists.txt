@@ -5,6 +5,7 @@ project(EngineMaxim)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+add_executable(EngineMaxim main.cpp)
 
 include(FetchContent)
 
@@ -32,7 +33,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(CookbookWrapperLib)
 
-add_executable(EngineMaxim main.cpp)
+
 
 if(WIN32)
     
@@ -60,7 +61,23 @@ if(UNIX)
 
     link_directories(${X11_LIBRARIES})
 
-    target_link_libraries(EngineMaxim ${X11_LIBRARIES} Cookbook MaxText glm::glm)
+    # 1. Define Library A
+    #add_library(A STATIC a.cpp)
+    #target_include_directories(A PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/a_include) # A's public headers
+
+    # 2. Define Library B and link to A
+    #add_library(B STATIC b.cpp)
+    # B uses A internally, and B's public headers require A's headers.
+    # Therefore, B links to A as PUBLIC.
+    
+    target_link_libraries(CookbookWrapperLib PUBLIC ${X11_LIBRARIES})
+    #target_include_directories(B PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/b_include) # B's public headers
+
+    # 3. Define the Executable and link to B
+    #add_executable(MyApp main.cpp)
+    # MyApp only needs to link to B; A will be pulled in automatically due to transitivity.
+    target_link_libraries(EngineMaxim PUBLIC ${X11_LIBRARIES} MaxText CookbookWrapperLib glm::glm)   
+
 
     add_custom_command(TARGET ${PROJECT_NAME}  POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
