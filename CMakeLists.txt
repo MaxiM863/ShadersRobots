@@ -33,17 +33,40 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(CookbookWrapperLib)
 
+FetchContent_Declare(
+	OPENAL
+	GIT_REPOSITORY https://github.com/kcat/openal-soft.git
+    GIT_TAG 1.25.1
+)
 
+FetchContent_MakeAvailable(OPENAL)
+
+FetchContent_Declare(
+	Jolt
+	GIT_REPOSITORY https://github.com/jrouwe/JoltPhysics.git
+    GIT_TAG v5.5.0
+)
+
+FetchContent_Declare(
+	ozz
+	GIT_REPOSITORY https://github.com/guillaumeblanc/ozz-animation.git
+    GIT_TAG 0.16.0
+)
+
+FetchContent_MakeAvailable(ozz)
+
+FetchContent_Declare(
+	FreeType
+	GIT_REPOSITORY https://github.com/freetype/freetype.git
+    GIT_TAG VER-2-14-2
+)
+
+FetchContent_MakeAvailable(FreeType)
 
 if(WIN32)
     
     add_definitions(-DVK_USE_PLATFORM_WIN32_KHR)        
-    target_link_libraries(EngineMaxim PUBLIC MaxText CookbookWrapperLib glm::glm)   
-
-    add_custom_command(TARGET ${PROJECT_NAME}  POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-                ${CMAKE_CURRENT_SOURCE_DIR}/Data
-                ${CMAKE_CURRENT_BINARY_DIR}/Data)
+    target_link_libraries(EngineMaxim PUBLIC MaxText CookbookWrapperLib glm::glm OPENAL ozz FreeType)
 
 endif(WIN32)
 
@@ -60,34 +83,13 @@ if(UNIX)
     include_directories(${X11_INCLUDE_DIR})
 
     link_directories(${X11_LIBRARIES})
-
-    # 1. Define Library A
-    #add_library(A STATIC a.cpp)
-    #target_include_directories(A PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/a_include) # A's public headers
-
-    # 2. Define Library B and link to A
-    #add_library(B STATIC b.cpp)
-    # B uses A internally, and B's public headers require A's headers.
-    # Therefore, B links to A as PUBLIC.
     
     target_link_libraries(CookbookWrapperLib PUBLIC ${X11_LIBRARIES})
-    #target_include_directories(B PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/b_include) # B's public headers
-
-    # 3. Define the Executable and link to B
-    #add_executable(MyApp main.cpp)
-    # MyApp only needs to link to B; A will be pulled in automatically due to transitivity.
-    target_link_libraries(EngineMaxim PUBLIC ${X11_LIBRARIES} MaxText CookbookWrapperLib glm::glm)   
-
-
-    add_custom_command(TARGET ${PROJECT_NAME}  POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-                ${CMAKE_CURRENT_SOURCE_DIR}/Data
-                ${CMAKE_CURRENT_BINARY_DIR}/Data)
+    
+    target_link_libraries(EngineMaxim PUBLIC ${X11_LIBRARIES} MaxText CookbookWrapperLib glm::glm OPENAL ozz FreeType)  
 
 endif(UNIX)
 
 target_compile_definitions(EngineMaxim PRIVATE CMAKE_EXPORT_COMPILE_COMMANDS=1)
 
-
-
-#target_include_directories(EngineMaxim PRIVATE "./Cookbook" "./Samples/Common_Files" "./Library/Common_Files" "./Library/Source_Files" "./External" "./MaximEngine")
+add_custom_command(TARGET ${PROJECT_NAME}  POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/Data ${CMAKE_CURRENT_BINARY_DIR}/Data)
